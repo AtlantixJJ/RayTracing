@@ -2,6 +2,10 @@
 build
 src/CMakeFiles
 tools/CMakeFiles
-externals
+externals/jsoncpp
 Makefile
 cmake_install.cmake
+
+*.png
+*.bmp
+*.swp
