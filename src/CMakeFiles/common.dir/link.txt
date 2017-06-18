@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc lib/libcommon.a  CMakeFiles/common.dir/common/bmp.cpp.o CMakeFiles/common.dir/common/color.cpp.o CMakeFiles/common.dir/common/vector2.cpp.o CMakeFiles/common.dir/common/vector3.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib lib/libcommon.a

@@ -1,0 +1,5 @@
+.vscode
+build
+externals
+Makefile
+cmake_install.cmake

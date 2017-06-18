@@ -1,0 +1,6 @@
+set(EXECUTABLE_OUTPUT_PATH ${ROOT_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH  ${ROOT_DIR}/lib)
+add_executable(raytracing main.cpp)
+add_executable(model modeling.cpp)
+target_link_libraries(raytracing engine scene jsoncpp_lib_static)
+target_link_libraries(model object jsoncpp_lib_static)

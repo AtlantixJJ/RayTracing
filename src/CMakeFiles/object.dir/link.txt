@@ -1,0 +1,2 @@
+/Library/Developer/CommandLineTools/usr/bin/ar qc lib/libobject.a  CMakeFiles/object.dir/object/collision.cpp.o CMakeFiles/object.dir/object/cylinder.cpp.o CMakeFiles/object.dir/object/material.cpp.o CMakeFiles/object.dir/object/object.cpp.o CMakeFiles/object.dir/object/plane.cpp.o CMakeFiles/object.dir/object/rotationbody.cpp.o CMakeFiles/object.dir/object/sphere.cpp.o
+/Library/Developer/CommandLineTools/usr/bin/ranlib lib/libobject.a
