@@ -13,13 +13,11 @@ public:
     virtual std::string getType() const override { return "Plane"; }
 
     // 与视线相交
-    virtual Collision collide(const Vector3& start, const Vector3& dir) const override;
-
+    virtual void collide(Collision* coll, const Vector3& start,
+         const Vector3& dir) override;
     // 交点处的纹理颜色
     virtual Color getTextureColor(const Collision& coll) const override;
-
     virtual Json::Value toJson() const override;
-
     // 设置纹理坐标轴
     void setTextureAxis(const Vector3& o, const Vector3& dx, const Vector3& dy) { m_o = o, m_dx = dx, m_dy = dy; }
 

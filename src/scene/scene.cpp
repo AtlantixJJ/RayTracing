@@ -52,17 +52,21 @@ Scene::~Scene()
 
 Collision Scene::findNearestCollision(const Vector3& start, const Vector3& dir) const
 {
-    Collision ret;
+    if(DEBUG>=2)printf("Finding Nearest Collision.\n");
+    Collision ret; // result
+    Collision coll; // temp
+    // to be accerlerated
     for (auto l : m_lights)
     {
-        Collision coll = l->collide(start, dir);
+        l->collide(&coll, start, dir);
         if (coll.isHit() && coll.dist + Const::EPS < ret.dist) ret = coll;
     }
     for (auto o : m_objects)
     {
-        Collision coll = o->collide(start, dir);
+        o->collide(&coll, start, dir);
         if (coll.isHit() && coll.dist + Const::EPS < ret.dist) ret = coll;
     }
+    if(DEBUG>=2)printf("findNearestCollision Done.\n");
     return ret;
 }
 

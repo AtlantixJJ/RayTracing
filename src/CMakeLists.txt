@@ -1,28 +1,28 @@
-set(src_dir ${PROJECT_SOURCE_DIR}/src )
-
-include_directories(${PROJECT_SOURCE_DIR}/tools)
-include_directories(${PROJECT_SOURCE_DIR}/src)
-
+include_directories(.)
 set(EXECUTABLE_OUTPUT_PATH ${ROOT_DIR}/bin)
 set(LIBRARY_OUTPUT_PATH  ${ROOT_DIR}/lib)
 
-aux_source_directory(${src_dir}/common COMMON_SRCS)
-aux_source_directory(${src_dir}/util UTIL_SRCS)
-aux_source_directory(${src_dir}/light LIGHT_SRCS)
-aux_source_directory(${src_dir}/object OBJECT_SRCS)
-aux_source_directory(${src_dir}/scene SCENE_SRCS)
-aux_source_directory(${src_dir}/engine RAY_TRACING_SRCS)
-aux_source_directory(${src_dir}/modeling MODELING)
-
+aux_source_directory(common COMMON_SRCS)
 add_library(common ${COMMON_SRCS})
-add_library(util ${UTIL_SRCS})
-add_library(light ${LIGHT_SRCS})
-add_library(object ${OBJECT_SRCS})
-add_library(scene ${SCENE_SRCS})
-add_library(engine ${RAY_TRACING_SRCS})
-#add_library(modeling ${MODELING})
+target_link_libraries(common jsoncpp_lib_static)
 
-target_link_libraries(object util common)
+aux_source_directory(math MATH_SRCS)
+add_library(math ${MATH_SRCS})
+
+aux_source_directory(light LIGHT_SRCS)
+add_library(light ${LIGHT_SRCS})
+
+aux_source_directory(object OBJECT_SRCS)
+add_library(object ${OBJECT_SRCS})
+target_link_libraries(object common math )
+
+aux_source_directory(scene SCENE_SRCS)
+add_library(scene ${SCENE_SRCS})
 target_link_libraries(scene object light common)
-target_link_libraries(engine scene jsoncpp_lib_static)
-#target_link_libraries(modeling object jsoncpp_lib_static)
+
+aux_source_directory(engine ENGINE_SRCS)
+add_library(engine ${ENGINE_SRCS})
+target_link_libraries(engine common object scene)
+
+add_executable(raytracing tools/main.cpp)
+target_link_libraries(raytracing object scene object engine object)

@@ -1,7 +1,8 @@
 #include "common/const.h"
+#include "common/collision.h"
 #include "object/cylinder.h"
 #include "object/rotationbody.h"
-#include "util/polynomial6.h"
+#include "math/polynomial6.h"
 
 const int SUBSURFACE_NUM = 32;
 const int ITERATION_NUM = 20;
@@ -29,19 +30,20 @@ RotationBody::~RotationBody()
     m_sub_cylinders.clear();
 }
 
-Collision RotationBody::collide(const Vector3& start, const Vector3& dir) const
+void RotationBody::collide(Collision* coll,
+    const Vector3& start, const Vector3& dir)
 {
     Vector3 d = dir.unitize();
     int curve_id = 0;
     Vector2 res(1e9, 0);
 
-    Collision coll = m_bounding_cylinder->collide(start, d);
-    if (!coll.isHit()) return Collision();
+    m_bounding_cylinder->collide(coll, start, d);
+    if (!coll->isHit()) return coll->collide();
 
     for (size_t i = 0; i < m_curves.size(); i++)
     {
-        coll = m_sub_cylinders[i]->collide(start, d);
-        if (!coll.isHit() || (!coll.is_internal && coll.dist > res.x - Const::EPS)) continue;
+        m_sub_cylinders[i]->collide(coll, start, d);
+        if (!coll->isHit() || (!coll->is_internal && coll->dist > res.x - Const::EPS)) continue;
 
         Vector3 o = start - m_o;
         Vector2 w = d.toVector2(), q0, q1, q2, q3;
@@ -90,12 +92,12 @@ Collision RotationBody::collide(const Vector3& start, const Vector3& dir) const
         Vector2 v = (start - m_o + d * res.x).toVector2().unitize(), dp = m_curves[curve_id].dP(res.y);
         Vector3 n = Vector3(-dp.y * v.x, -dp.y * v.y, dp.x);
         if (n.dot(d) < Const::EPS)
-            return Collision(start, d, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), n, this);
+            return coll->collide(start, d, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), n, this);
         else
-            return Collision(start, d, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), -n, this);
+            return coll->collide(start, d, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), -n, this);
     }
     else
-        return Collision();
+        return coll->collide();
 }
 
 Color RotationBody::getTextureColor(const Collision& coll) const

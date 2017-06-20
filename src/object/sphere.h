@@ -13,7 +13,7 @@ public:
     virtual std::string getType() const override { return "Sphere"; }
 
     // 与视线相交
-    virtual Collision collide(const Vector3& start, const Vector3& dir) const override;
+    virtual void collide(Collision* coll,const Vector3& start, const Vector3& dir) override;
 
     // 交点处的纹理颜色
     virtual Color getTextureColor(const Collision& coll) const override;

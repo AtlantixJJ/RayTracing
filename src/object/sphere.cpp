@@ -13,7 +13,7 @@ Sphere::Sphere(const Json::Value& object)
 {
 }
 
-Collision Sphere::collide(const Vector3& start, const Vector3& dir) const
+void Sphere::collide(Collision* coll,const Vector3& start, const Vector3& dir)
 {
     Vector3 d = dir.unitize();
     Vector3 oc = m_o - start;
@@ -24,16 +24,16 @@ Collision Sphere::collide(const Vector3& start, const Vector3& dir) const
         if (t1 > Const::EPS)
         {
             Vector3 p = start + d * t1;
-            return Collision(start, d, t1, p - m_o, this, false);
+            return coll->collide(start, d, t1, p - m_o, this, false);
         }
         else if (t2 > Const::EPS)
         {
             Vector3 p = start + d * t2;
-            return Collision(start, d, t2, m_o - p, this, true);
+            return coll->collide(start, d, t2, m_o - p, this, true);
         }
     }
 
-    return Collision();
+    return coll->collide();
 }
 
 Color Sphere::getTextureColor(const Collision& coll) const

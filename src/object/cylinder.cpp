@@ -1,5 +1,6 @@
 #include "common/const.h"
 #include "object/cylinder.h"
+#include "common/collision.h"
 
 Cylinder::Cylinder(const Vector3& o, double r, double h, const Material* m)
     : Object(m), m_o(o), m_r(r), m_h(h),
@@ -13,7 +14,7 @@ Cylinder::Cylinder(const Json::Value& object)
 {
 }
 
-Collision Cylinder::collide(const Vector3& start, const Vector3& dir) const
+void Cylinder::collide(Collision* coll, const Vector3& start, const Vector3& dir)
 {
     Vector3 d3 = dir.unitize();
     Vector2 d2(d3.x, d3.y), oc = Vector2(m_o.x - start.x, m_o.y - start.y);
@@ -30,21 +31,21 @@ Collision Cylinder::collide(const Vector3& start, const Vector3& dir) const
             Vector3 p = start + d3 * t1;
             Vector2 q = (p - m_o).toVector2();
             if (q.mod2() < m_r * m_r + Const::EPS)
-                return Collision(start, d3, t1, u1, q.arg(), Vector3(0, 0, -d3.z), this, in);
+                return coll->collide(start, d3, t1, u1, q.arg(), Vector3(0, 0, -d3.z), this, in);
         }
         else if (t2 > Const::EPS) // 若射线和第二个底面相交，且射线起点在圆柱体内，也直接返回
         {
             Vector3 p = start + d3 * t2;
             Vector2 q = (p - m_o).toVector2();
             if (q.mod2() < m_r * m_r + Const::EPS && in)
-                return Collision(start, d3, t2, u2, q.arg(), Vector3(0, 0, -d3.z), this, in);
+                Collision::setCollision(coll, start, d3, t2, u2, q.arg(), Vector3(0, 0, -d3.z), this, in);
         }
         else // 若射线不和上下底面所在的平面相交，则无交点
-            return Collision();
+            return coll->collide();
     }
 
     // 若射线垂直于 xy 平面，则交点不会在圆柱面上
-    if (d2.mod2() < Const::EPS && t < 0) return Collision();
+    if (d2.mod2() < Const::EPS && t < 0) return coll->collide();
 
     // 否则第一个交点为圆柱面
     double tca = oc.dot(d2.unitize()), thc2 = m_r * m_r - oc.mod2() + tca * tca;
@@ -61,10 +62,10 @@ Collision Cylinder::collide(const Vector3& start, const Vector3& dir) const
         t /= d2.mod();
         Vector3 p = start + d3 * t;
         if (m_o.z < p.z + Const::EPS && p.z < m_o.z + m_h + Const::EPS)
-            return Collision(start, d3, t, (p.z - m_o.z) / m_h, (p - m_o).toVector2().arg(),
+            return coll->collide(start, d3, t, (p.z - m_o.z) / m_h, (p - m_o).toVector2().arg(),
                              Vector3(p.x - m_o.x, p.y - m_o.y, 0) * (in ? -1 : 1), this, in);
     }
-    return Collision();
+    return coll->collide();
 }
 
 Color Cylinder::getTextureColor(const Collision& coll) const

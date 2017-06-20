@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define DEBUG -1
+
 namespace Const
 {
 const double EPS = 1e-6;

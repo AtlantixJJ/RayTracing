@@ -1,0 +1,28 @@
+set(src_dir ${PROJECT_SOURCE_DIR}/src )
+
+include_directories(${PROJECT_SOURCE_DIR}/tools)
+include_directories(${PROJECT_SOURCE_DIR}/src)
+
+set(EXECUTABLE_OUTPUT_PATH ${ROOT_DIR}/bin)
+set(LIBRARY_OUTPUT_PATH  ${ROOT_DIR}/lib)
+
+aux_source_directory(${src_dir}/common COMMON_SRCS)
+aux_source_directory(${src_dir}/math MATH_SRCS)
+aux_source_directory(${src_dir}/light LIGHT_SRCS)
+aux_source_directory(${src_dir}/object OBJECT_SRCS)
+aux_source_directory(${src_dir}/scene SCENE_SRCS)
+aux_source_directory(${src_dir}/engine RAY_TRACING_SRCS)
+aux_source_directory(${src_dir}/modeling MODELING)
+
+add_library(common ${COMMON_SRCS})
+add_library(math ${MATH_SRCS})
+add_library(light ${LIGHT_SRCS})
+add_library(object ${OBJECT_SRCS} ${COMMON_SRCS})
+target_link_libraries(object common math)
+add_library(scene ${SCENE_SRCS})
+add_library(engine ${RAY_TRACING_SRCS})
+
+
+target_link_libraries(scene object light common)
+target_link_libraries(engine scene object common jsoncpp_lib_static)
+#target_link_libraries(model object jsoncpp_lib_static)

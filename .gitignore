@@ -1,4 +1,5 @@
 .vscode
+Reference
 build
 src/CMakeFiles
 tools/CMakeFiles

@@ -1,7 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "object/collision.h"
+#include "common/collision.h"
 #include "object/material.h"
 
 class Plane;
@@ -18,7 +18,7 @@ public:
     virtual std::string getType() const = 0;
 
     // 与视线相交
-    virtual Collision collide(const Vector3& start, const Vector3& dir) const = 0;
+    virtual void collide(Collision* coll, const Vector3& start, const Vector3& dir) =0;
 
     // 交点处的纹理颜色
     virtual Color getTextureColor(const Collision& coll) const = 0;

@@ -3,10 +3,12 @@
 
 #include "common/vector3.h"
 #include "object/object.h"
-#include "util/beziercurve3.h"
+#include "math/beziercurve3.h"
 
 #include <vector>
-
+/**
+*   
+**/
 class RotationBody : public Object
 {
 public:
@@ -18,24 +20,25 @@ public:
 
     virtual std::string getType() const override { return "RotationBody"; }
 
-    // 与视线相交
-    virtual Collision collide(const Vector3& start, const Vector3& dir) const override;
+    /// 与视线相交
+    virtual void collide(Collision* coll, 
+        const Vector3& start, const Vector3& dir) override;
 
-    // 交点处的纹理颜色
+    /// 交点处的纹理颜色
     virtual Color getTextureColor(const Collision& coll) const override;
 
     virtual Json::Value toJson() const override;
 
-    // 设置纹理起点极角
+    /// 设置纹理起点极角
     void setTextureArg(double a) { m_arg = a; }
 
     BezierCurve3 getCurve(int i) const { return m_curves[i]; }
     void addCurve(const BezierCurve3& curve) { m_curves.push_back(curve); }
 
-    // 曲面上一点 P(u, v)
+    /// 曲面上一点 P(u, v)
     Vector3 P(int i, double u, double v) const;
 
-    // 保存为 OBJ 格式
+    /// 保存为 OBJ 格式
     void saveOBJ(const std::string& file, int density) const;
 
 private:

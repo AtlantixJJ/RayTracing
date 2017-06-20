@@ -48,6 +48,7 @@ Color RayTracer::rayTracing(const Vector3& start, const Vector3& dir, double wei
 {
     if (weight < Const::MIN_WEIGHT) return m_scene->getAmbientLightColor();
     Collision coll = m_scene->findNearestCollision(start, dir);
+    if(DEBUG>=2)coll.printInfo();
     if (!coll.isHit())
         return m_scene->getAmbientLightColor();
     else if (coll.atLight())

@@ -1,5 +1,6 @@
 #include "common/const.h"
 #include "object/plane.h"
+#include "common/collision.h"
 
 Plane::Plane(const Vector3& n, double d, const Material* m)
     : Object(m), m_n(n.unitize()), m_d(d),
@@ -19,16 +20,17 @@ Plane::Plane(const Json::Value& object)
 {
 }
 
-Collision Plane::collide(const Vector3& start, const Vector3& dir) const
+void Plane::collide(Collision* coll, const Vector3& start, 
+    const Vector3& dir)
 {
     double n = m_n.dot(start) + m_d, d = m_n.dot(dir);
-    if (abs(d) < Const::EPS) return Collision();
+    if (abs(d) < Const::EPS) return coll->collide();
     double t = -n / d;
-    if (t < Const::EPS) return Collision();
+    if (t < Const::EPS) return coll->collide();
     if (n > Const::EPS)
-        return Collision(start, dir, t, m_n, this);
+        return coll->collide(start, dir, t, m_n, this);
     else
-        return Collision(start, dir, t, -m_n, this);
+        return coll->collide(start, dir, t, -m_n, this);
 }
 
 Color Plane::getTextureColor(const Collision& coll) const
