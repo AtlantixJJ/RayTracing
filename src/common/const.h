@@ -11,6 +11,7 @@ using namespace std;
 
 namespace Const
 {
+const double PH_DEC = 0.1;
 const double EPS = 1e-6;
 const double PI = acos(-1.0);
 

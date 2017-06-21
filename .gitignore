@@ -1,6 +1,7 @@
 .vscode
 Reference
 build
+src/tools/CMakeFiles
 src/CMakeFiles
 tools/CMakeFiles
 externals/jsoncpp

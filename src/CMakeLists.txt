@@ -20,9 +20,5 @@ aux_source_directory(scene SCENE_SRCS)
 add_library(scene ${SCENE_SRCS})
 target_link_libraries(scene object light common)
 
-aux_source_directory(engine ENGINE_SRCS)
-add_library(engine ${ENGINE_SRCS})
-target_link_libraries(engine common object scene)
-
-add_executable(raytracing tools/main.cpp)
-target_link_libraries(raytracing object scene object engine object)
+add_subdirectory(engine)
+add_subdirectory(tools)

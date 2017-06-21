@@ -1,14 +1,13 @@
 #include "common/const.h"
 #include "light/light.h"
 #include "object/object.h"
-#include "engine/raytracer.h"
+#include "engine/raytrace/raytracer.h"
 #include "scene/camera.h"
 #include "scene/scene.h"
 
-void RayTracer::run(Scene* scene, const std::string& outFile)
+void RayTracer::run(const std::string& outFile)
 {
-    m_scene = scene;
-    Camera* camera = m_scene->getCamera();
+    Camera* camera = scene->getCamera();
     int w = camera->getW(), h = camera->getH();
 
     for (int i = 0; i < w; i++)
@@ -27,13 +26,13 @@ Color RayTracer::calcLocalIllumination(const Collision& coll, const Material* ma
 {
     Vector3 r = coll.ray_dir.reflect(coll.n);
     Color color = material->color * coll.object->getTextureColor(coll);
-    Color ret = color * m_scene->getAmbientLightColor() * material->diff; // 环境光
-    for (auto light = m_scene->lightsBegin(); light != m_scene->lightsEnd(); light++)
+    Color ret = color * scene->getAmbientLightColor() * material->diff; // 环境光
+    for (auto light = scene->lightsBegin(); light != scene->lightsEnd(); light++)
     {
         Vector3 l = ((*light)->getSource() - coll.p).unitize();
         double f = l.dot(coll.n);
         if (f < Const::EPS) continue;
-        double shade = (*light)->getShadowRatio(m_scene, coll.p);
+        double shade = (*light)->getShadowRatio(scene, coll.p);
         if (shade < Const::EPS) continue;
 
         if (material->diff > Const::EPS) // 漫反射
@@ -46,11 +45,11 @@ Color RayTracer::calcLocalIllumination(const Collision& coll, const Material* ma
 
 Color RayTracer::rayTracing(const Vector3& start, const Vector3& dir, double weight, int depth, bool isInternal) const
 {
-    if (weight < Const::MIN_WEIGHT) return m_scene->getAmbientLightColor();
-    Collision coll = m_scene->findNearestCollision(start, dir);
+    if (weight < Const::MIN_WEIGHT) return scene->getAmbientLightColor();
+    Collision coll = scene->findNearestCollision(start, dir);
     if(DEBUG>=2)coll.printInfo();
     if (!coll.isHit())
-        return m_scene->getAmbientLightColor();
+        return scene->getAmbientLightColor();
     else if (coll.atLight())
         return coll.light->getColor();
     else if (depth <= Const::MAX_DEPTH)

@@ -53,7 +53,7 @@ struct Collision
     void printInfo() const {
         printf("isHit : %d\t atLight : %d\n",isHit(), atLight());
         if(isHit())printf("Dist : %lf\n",dist);
-        if(atLight())printf("Light : %d\n",light);
+        //if(atLight())printf("Light : %d\n",light);
     }
 
     const Object* object;             // 相交的物体

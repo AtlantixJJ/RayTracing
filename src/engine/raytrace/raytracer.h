@@ -3,22 +3,22 @@
 
 #include "common/color.h"
 #include "common/vector3.h"
+#include "engine/engine.h"
 
 class Collision;
 class Material;
 class Scene;
 
-class RayTracer
+class RayTracer : public Engine
 {
 public:
-    RayTracer() {}
+    RayTracer(Scene *scene):Engine(scene) {}
     ~RayTracer() {}
 
-    void run(Scene* scene, const std::string& outFile);
+    virtual void run(const std::string& outFile);
 
-private:
-    Scene* m_scene;
-
+protected:
+    
     Color calcLocalIllumination(const Collision& coll, const Material* Material) const;
     Color calcReflection(const Collision& coll, const Material* Material, double weight, int depth, bool isInternal) const;
     Color calcRefraction(const Collision& coll, const Material* Material, double weight, int depth, bool isInternal) const;

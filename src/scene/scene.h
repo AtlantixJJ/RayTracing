@@ -2,6 +2,8 @@
 #define SCENE_H
 
 #include <vector>
+#include "light/light.h"
+#include "object/object.h"
 
 class Camera;
 class Collision;
