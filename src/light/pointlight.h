@@ -18,7 +18,7 @@ public:
     // 与视线相交
     virtual void collide(Collision* coll, const Vector3& start, 
         const Vector3& dir) override;
-
+    virtual Photon emitPhoton(double power) const;
     // 计算阴影比例
     virtual double getShadowRatio(const Scene* scene, const Vector3& p) const override;
 

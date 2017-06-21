@@ -13,11 +13,12 @@ int main(int argc, char* argv[])
         
         if (scene)
         {
-            //Engine* engine = new RayTracer(scene);
-            Engine* engine = new PhotonMapper(scene);
-            engine->run("output.bmp");
+            Engine* enginer = new RayTracer(scene);
+            Engine* enginep = new PhotonMapper(scene);
+            enginer->run("output.bmp");
             delete scene;
-            delete engine;
+            delete enginer;
+            delete enginep;
         }
         
     }

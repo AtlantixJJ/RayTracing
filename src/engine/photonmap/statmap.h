@@ -44,7 +44,6 @@ protected:
 
     int samples; // 最近的光子数
     Vector3 pos; // 询问点
-
-
 };
+
 #endif

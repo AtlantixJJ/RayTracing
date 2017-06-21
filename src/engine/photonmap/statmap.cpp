@@ -31,7 +31,7 @@ Color StatMap::getIrradiance(const Collision& coll, int N)
 
 void StatMap::buildMap(bool flag)
 {
-    clear();
+    if(flag)clear();
     n = buffer.size();
     phs = new Photon[n];
 

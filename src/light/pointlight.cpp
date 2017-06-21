@@ -28,3 +28,8 @@ Json::Value PointLight::toJson() const
     light["o"] = m_o.toJson();
     return light;
 }
+
+Photon PointLight::emitPhoton(double power) const
+{
+    return Photon(m_o, Vector3::randVector(), m_color * (power / m_color.power()));
+}

@@ -8,8 +8,6 @@ void PhotonMapper::run(const std::string& outFile)
     PhotonTracer* tracer = new PhotonTracer(scene);
     //map = tracer->getPhotonMap();
     //delete tracer;
-
     //RayTracer::run(outFile);
-
     //delete map;
 }
