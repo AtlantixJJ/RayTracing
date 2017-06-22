@@ -9,6 +9,7 @@
 
 RayTracer::RayTracer(Scene* scene)
     : Engine(scene){
+    isbase=false;
     if (scene)
     {
         _hash = new ID*[_w];
@@ -47,9 +48,9 @@ void RayTracer::run(const std::string& outFile){
     #pragma omp parallel for num_threads(tn)
 #endif
     for (i = 0; i < PixelTot; i++){
-        //printf("Row %d | %d\n",i,Config::thread_max_number);
         int x = i / _h;
         int y = i % _h;
+        if(isbase && y == 0)printf("Row %d\n",x);
 
         omp_set_lock(&lock);
         tot++;
@@ -57,16 +58,9 @@ void RayTracer::run(const std::string& outFile){
         _hash[x][y] = 0;
         Color c = _DOFTracing(x, y);
         _camera->setColor(x, y, c);
-        /*
-        if (Config::snapshot_interval > 0 &&
-            clock() - last > Config::snapshot_interval * CLOCKS_PER_SEC){
-            last = clock();
-            _camera->print(outFile.c_str());
-        }*/
     }
-    printf("%d\n",tot);
+    printf("Pixel Number : %d\n",tot);
     _camera->print(outFile.c_str());
-
 }
 
 Color RayTracer::_DOFTracing(double ox, double oy, double f) const

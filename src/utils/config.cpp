@@ -12,7 +12,7 @@ int Config::ss_edge = 0;
 
 int Config::ssnum = 4;
 
-int Config::dof = 64;
+int Config::dof = 8;
 
 bool Config::enable_fresnel = true;
 
@@ -34,7 +34,7 @@ double Config::ppm_search_rad = 0.1;
 
 int Config::ppm_iteration_depth = 20;
 
-int Config::ppm_photo_number = 100000;
+int Config::ppm_photo_number = 1000000;
 
 int Config::newton_iters = 20;
 

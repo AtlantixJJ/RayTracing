@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
         break;
     }
 
-    engine->run(argv[2]);
+    engine->run(argv[3]);
 
     if (scene) delete scene;
     delete engine;
