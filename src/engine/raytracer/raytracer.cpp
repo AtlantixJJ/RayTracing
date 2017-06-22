@@ -27,6 +27,7 @@ RayTracer::~RayTracer(){
     delete[] _hash;
 }
 
+
 void RayTracer::run(const std::string& outFile){
     if (!_scene) return;
 
@@ -37,8 +38,13 @@ void RayTracer::run(const std::string& outFile){
     omp_lock_t lock;
     omp_init_lock(&lock);
     int PixelTot = _w*_h;
+    int tn = Config::thread_max_number;
+    if(isbase){
+        printf("Change to single thread raytracing.\n");
+        tn = 1;
+    }
 #ifdef MULTITHREAD
-        #pragma omp parallel for num_threads(Config::thread_max_number)
+    #pragma omp parallel for num_threads(tn)
 #endif
     for (i = 0; i < PixelTot; i++){
         //printf("Row %d | %d\n",i,Config::thread_max_number);
@@ -76,7 +82,9 @@ Color RayTracer::_DOFTracing(double ox, double oy, double f) const
     return color;
 }
 
-Color RayTracer::_localIllumination(const Intersection& coll, const Material* material, const Color& factor) const
+Color RayTracer::_localIllumination(const Intersection& coll,
+     const Material* material, const Color& factor,
+     int fx, int fy) const
 {
     Color color = material->color * coll.getObject()->getTextureColor(coll);
     Color ret = color * _scene->getAmbientLightColor() * material->diff; // 环境光
@@ -117,7 +125,7 @@ Color RayTracer::_rayTracing(const Ray& ray, int fx, int fy,
         if (isInternal) absorb = (material->absorb_color * -coll.dist).exp();
 
         if (material->diff > Const::EPS || material->spec > Const::EPS)
-            ret += _localIllumination(coll, material, factor * absorb);
+            ret += _localIllumination(coll, material, factor * absorb, fx, fy);
         if (material->refl > Const::EPS || material->refr > Const::EPS)
         {
             double n = material->rindex;

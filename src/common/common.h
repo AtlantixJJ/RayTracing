@@ -4,7 +4,7 @@
 #include "common/common.h"
 #include "math/vector3.h"
 
-#define DEBUG 1
+#define DEBUG 0
 #define MULTITHREAD 1
 
 struct Photon;

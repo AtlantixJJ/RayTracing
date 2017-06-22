@@ -19,7 +19,9 @@ void PhotonMapper::run(const std::string& outFile)
     delete _map;
 }
 
-Color PhotonMapper::_localIllumination(const Intersection& coll, const Material* material, const Color& factor) const
+Color PhotonMapper::_localIllumination(const Intersection& coll,
+    const Material* material, const Color& factor,
+    int fx, int fy) const
 {
     Color color = material->color * coll.getObject()->getTextureColor(coll),
           ret = color * _map->getIrradiance(coll, Config::photo_sample) * (material->diff / Config::photo_number) * factor;

@@ -31,10 +31,12 @@ void HitPointMap::build()
 
 void HitPointMap::update()
 {
+    printf("In Hitpoint Update...\n");
     for (auto& point : _points)
         if (point.M)
         {
             double k = (point.N + point.M * Config::ppm_alpha) / (point.N + point.M);
+            
             point.r2 *= k;
             point.flux *= k;
             point.N += point.M * Config::ppm_alpha;
@@ -53,8 +55,14 @@ void HitPointMap::_findNearHitPoints(int l, int r, const Photon& photon)
         pos.y < _nodes[mi].y1 || pos.y > _nodes[mi].y2 ||
         pos.z < _nodes[mi].z1 || pos.z > _nodes[mi].z2) return;
 
-    if ((pos - _nodes[mi].point->pos).mod2() <= _nodes[mi].point->r2)
-        _nodes[mi].point->update(photon);
+    if ((pos - _nodes[mi].point->pos).mod2() <= _nodes[mi].point->r2){
+        if(randDouble < 0.001){
+            if(DEBUG>=1)std::cout<<"flo:"<<_nodes[mi].point->flux<<std::endl;
+            _nodes[mi].point->update(photon, true);
+            if(DEBUG>=1)std::cout<<"flo:"<<_nodes[mi].point->flux<<std::endl;
+        }else
+            _nodes[mi].point->update(photon);
+    }
 
     if (pos[k] - _nodes[mi].point->pos[k] < 0)
     {

@@ -19,7 +19,10 @@ public:
 
     // 用于 PPM
     PhotonTracer(Scene* scene, HitPointMap* map)
-        : _photon_map(nullptr), _hit_point_map(map), _scene(scene) {}
+        : _photon_map(nullptr), _hit_point_map(map), _scene(scene) {
+            omp_init_lock(&lock);
+            omp_init_lock(&lock2);
+        }
 
     ~PhotonTracer() {
         omp_destroy_lock(&lock);
@@ -30,6 +33,7 @@ public:
     void emitPhotons(int photonNumber);
 
 private:
+    int asd; ///< test var
     PhotonMap* _photon_map;
     HitPointMap* _hit_point_map;
     Scene* _scene;

@@ -36,6 +36,7 @@ void PPM::run(const std::string& outFile)
         _camera->setFilm(film);
         for (auto p = _map->hitPointBegin(); p != _map->hitPointEnd(); p++)
         {
+            if(DEBUG >= 1 && randDouble<0.001)std::cout<<"flux "<<p->flux<<std::endl;
             Color color = _camera->getColor(p->x, p->y) + p->color * p->flux * (1 / Const::PI / p->r2 / tot);
             _camera->setColor(p->x, p->y, color);
         }
@@ -47,10 +48,12 @@ void PPM::run(const std::string& outFile)
     delete _map;
 }
 
-Color PPM::_localIllumination(const Intersection& coll, const Material* material, const Color& factor) const
+Color PPM::_localIllumination(const Intersection& coll,
+     const Material* material, const Color& factor,
+     int fx, int fy) const
 {
     if (_find_edge)
-        return RayTracer::_localIllumination(coll, material, factor);
+        return RayTracer::_localIllumination(coll, material, factor, fx, fy);
 
     HitPoint point;
     point.pos = coll.p;
@@ -59,12 +62,13 @@ Color PPM::_localIllumination(const Intersection& coll, const Material* material
     point.material = material;
     point.color = material->color * coll.getObject()->getTextureColor(coll) * factor * material->diff;
     point.r2 = Config::ppm_search_rad;
-    point.x = _cur_x;
-    point.y = _cur_y;
+    point.x = fx;
+    point.y = fy;
+    //printf("%d %d\n",point.x,point.y);
     _map->addHitPoint(point);
 
     if (Config::photon_map_only)
         return Color();
     else
-        return RayTracer::_localIllumination(coll, material, factor);
+        return RayTracer::_localIllumination(coll, material, factor, fx, fy);
 }

@@ -20,15 +20,11 @@ struct HitPoint
     int N, M;   // 累计光子数，本轮发射累计光子数
     Color flux; // 光通量
 
-    void update(const Photon& photon,bool dbgf=false)
+    void update(const Photon& photon)
     {
         M++;
         if (photon.dir.dot(n) < -Const::EPS)
             flux += photon.pow * material->BRDF(-photon.dir, n, dir);
-        if (dbgf && DEBUG >= 1){
-            printf("UPD : power : ");
-            std::cout<<photon.pow<<" "<< material->BRDF(-photon.dir, n, dir)<<std::endl;
-        }
     }
 };
 
@@ -36,17 +32,14 @@ class HitPointMap
 {
 public:
     HitPointMap()
-        : _n(0), _plane(nullptr), _nodes(nullptr) {}
+        : m_n(0), m_plane(nullptr), m_nodes(nullptr) {}
     ~HitPointMap();
 
-    std::vector<HitPoint>::const_iterator hitPointBegin() const { return _points.begin(); }
-    std::vector<HitPoint>::const_iterator hitPointEnd() const { return _points.end(); }
+    std::vector<HitPoint>::const_iterator hitPointBegin() const { return m_points.begin(); }
+    std::vector<HitPoint>::const_iterator hitPointEnd() const { return m_points.end(); }
 
     // 加入 hit point
-    void addHitPoint(const HitPoint& point) {
-        //printf("addHit\n");
-        _points.push_back(point); 
-    }
+    void addHitPoint(const HitPoint& point) { m_points.push_back(point); }
 
     // 根据光子更新 hit point
     void incomingPhoton(const Photon& photon);
@@ -83,19 +76,19 @@ private:
         double x1, x2, y1, y2, z1, z2; // bounding box
     };
 
-    int _n;
-    unsigned char* _plane;
-    Node* _nodes;
-    std::vector<HitPoint> _points;
+    int m_n;
+    unsigned char* m_plane;
+    Node* m_nodes;
+    std::vector<HitPoint> m_points;
 
     // 建 KD-tree
-    void _build(int l, int r);
+    void m_build(int l, int r);
 
     // 更新 r2 后需重新建树来更新 bounding box
-    void _rebuild(int l, int r);
+    void m_rebuild(int l, int r);
 
     // 找所有距离不超过 sqrt(r2) 的 hit point
-    void _findNearHitPoints(int l, int r, const Photon& photon);
+    void m_findNearHitPoints(int l, int r, const Photon& photon);
 };
 
 #endif // HITPOINTMAP_H

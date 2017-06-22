@@ -47,6 +47,7 @@ void PhotonTracer::emitPhotons(int photonNumber)
 
 void PhotonTracer::emitPhotons(int photonNumber)
 {
+    printf("InTracing\n");
     double power = 0, lp = 0;
     int tot = 0;
     Photon ph;
@@ -58,7 +59,8 @@ void PhotonTracer::emitPhotons(int photonNumber)
     }
     //printf("%d\n",gconf);   
     int i;
-    printf("power:%lf",power);
+    asd = 0;
+    //printf("power:%lf\n",power);
 
 
     for( i = 0 ; i < _scene->getLightSourceNum() ; i++)
@@ -80,12 +82,13 @@ void PhotonTracer::emitPhotons(int photonNumber)
             //sleep(1);
             omp_set_lock(&lock);
             //printf("tot%d\n",tot);
-            if (++tot % 1000 == 0) printf( "Emitted %d photons.\n",tot);
+            if (++tot % 10000 == 0) printf( "Emitted %d photons.\n",tot);
             omp_unset_lock(&lock);
             //sleep(1);
             
         }
     }
+    printf("Total Photon : %d\n",asd);
 }
 
 
@@ -96,15 +99,18 @@ void PhotonTracer::_photonTracing(Photon& photon, int depth, bool isInternal)
     Intersection coll = _scene->findNearestIntersection(Ray(photon.pos, photon.dir));
     if (coll.isHit() && coll.atObject())
     {
+        omp_set_lock(&lock2);
+        asd++;
+        omp_unset_lock(&lock2);
         photon.pos = coll.p;
         const Object* obj = coll.getObject();
         const Material* material = obj->getMaterial();
         if (material->diff > Const::EPS)
         {
-            omp_set_lock(&lock2);
+            //omp_set_lock(&lock2);
             if (_photon_map) _photon_map->addPhoton(photon);
             if (_hit_point_map) _hit_point_map->incomingPhoton(photon);
-            omp_unset_lock(&lock2);
+            //omp_unset_lock(&lock2);
         }
 
         Color cd = material->color * obj->getTextureColor(coll), ct(1, 1, 1);

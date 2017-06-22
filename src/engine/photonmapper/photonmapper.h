@@ -18,7 +18,9 @@ public:
 private:
     PhotonMap* _map;
 
-    virtual Color _localIllumination(const Intersection& coll, const Material* Material, const Color& factor) const override;
+    virtual Color _localIllumination(const Intersection& coll, 
+        const Material* Material, const Color& factor,
+        int fx=-1, int fy=-1) const override;
 };
 
 #endif // PHOTONMAPPER_H

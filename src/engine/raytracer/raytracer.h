@@ -15,11 +15,12 @@ public:
 
     virtual void run(const std::string& outFile) override;
 protected:
+    bool isbase;
     bool** _is_edge; ///< Only do Super Resulution on edges to speed up
     int _cur_x, _cur_y; ///< the current tracing element
     ID** _hash; ///< using hash to accerlerate inersection
 
-    virtual Color _localIllumination(const Intersection& coll, const Material* Material, const Color& f) const;
+    virtual Color _localIllumination(const Intersection& coll, const Material* Material, const Color& f, int fx=-1, int fy=-1) const;
     
     Color _rayTracing(const Ray& ray, int fx, int fy, 
         const Color& factor, double weight, int depth, bool isInternal) const;

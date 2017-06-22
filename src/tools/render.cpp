@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
         break;
     }
 
-    engine->run("output.bmp");
+    engine->run(argv[2]);
 
     if (scene) delete scene;
     delete engine;
