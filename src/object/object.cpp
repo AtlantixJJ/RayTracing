@@ -1,8 +1,6 @@
-#include "object/cylinder.h"
+#include "object/geometry.h"
 #include "object/object.h"
-#include "object/plane.h"
 #include "object/rotationbody.h"
-#include "object/sphere.h"
 
 #include <fstream>
 #include <iostream>
@@ -10,26 +8,28 @@
 #include <json/writer.h>
 
 Object::Object(const Material* m)
-    : m_material(m == nullptr ? new Material() : m),
-      m_can_delete_material(m == nullptr ? true : false)
+    : _material(m == nullptr ? new Material() : m),
+      _identifier(randID),
+      _can_delete_material(m == nullptr ? true : false)
 {
 }
 
 Object::Object(const Json::Value& object)
-    : m_material(object["material"].isNull() ? new Material() : new Material(object["material"])),
-      m_can_delete_material(true)
+    : _material(object["material"].isNull() ? new Material() : new Material(object["material"])),
+      _identifier(randID),
+      _can_delete_material(true)
 {
 }
 
 Object::~Object()
 {
-    if (m_can_delete_material && m_material) delete m_material;
+    if (_can_delete_material && _material) delete _material;
 }
 
 Json::Value Object::toJson() const
 {
     Json::Value object;
-    object["material"] = m_material->toJson();
+    object["material"] = _material->toJson();
     return object;
 }
 

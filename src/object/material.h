@@ -1,23 +1,18 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
-#include "common/bmp.h"
-#include "common/color.h"
+#include "utils/bmp.h"
+#include "common/common.h"
+
+struct Vector3;
 
 struct Material
 {
 public:
     Material();
-
-    // 漫反射材质
     Material(const Color& c, double d, double s);
-
-    // 不透明反射材质
     Material(const Color& c, double d, double s, double rl);
-
-    // 透明材质
     Material(const Color& c, double d, double s, double rl, double rr, double ri, const Color& absorb);
-
     Material(const Json::Value material);
 
     virtual ~Material();
@@ -27,26 +22,23 @@ public:
     double refl, refr;         // 反射和折射光的比例
     double rindex;             // 折射率
 
-    bool hasTexture() const { return m_texture || m_texture_func; }
+    bool hasTexture() const { return _texture || _texture_func; }
 
-    void setTexture(Bmp* texture) { m_texture_func = nullptr, m_texture = texture; }
+    void setTexture(Bmp* texture) { _texture_func = nullptr, _texture = texture; }
     void setTexture(Color (*func)(double, double))
     {
-        if (m_texture) delete m_texture;
-        m_texture = nullptr, m_texture_func = func;
+        if (_texture) delete _texture;
+        _texture = nullptr, _texture_func = func;
     }
-
-    // 获得纹理颜色
     Color getTextureColor(double u, double v) const;
-
-    // 求交时的优先级
     bool compare(const Material* B) const;
+    double BRDF(const Vector3& l, const Vector3& n, const Vector3& v) const;
 
     virtual Json::Value toJson() const;
 
 private:
-    Bmp* m_texture;                          // 纹理图片
-    Color (*m_texture_func)(double, double); // 纹理函数
+    Bmp* _texture; 
+    Color (*_texture_func)(double, double);
 };
 
 #endif // MATERIAL_H

@@ -1,1 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/c++    -O2 -O3 -Wall -Wl,-search_paths_first -Wl,-headerpad_max_install_names  CMakeFiles/raytracing.dir/main.cpp.o  -o bin/raytracing  ../src/lib/libengine.a ../src/lib/libscene.a ../externals/jsoncpp/src/lib_json/libjsoncpp.a ../src/lib/libobject.a ../src/lib/libutil.a ../src/lib/liblight.a ../src/lib/libcommon.a 

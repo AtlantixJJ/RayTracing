@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc lib/liblight.a  CMakeFiles/light.dir/light/light.cpp.o CMakeFiles/light.dir/light/pointlight.cpp.o CMakeFiles/light.dir/light/rectlight.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib lib/liblight.a

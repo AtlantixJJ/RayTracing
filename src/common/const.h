@@ -7,22 +7,23 @@
 
 using namespace std;
 
-#define DEBUG -1
+typedef unsigned long long ID;
 
 namespace Const
 {
-const double PH_DEC = 0.1;
-const double EPS = 1e-6;
-const double PI = acos(-1.0);
 
-const double MIN_WEIGHT = 0.05;
-const int MAX_DEPTH = 20;
-const int SPEC_POWER = 50;
+constexpr double EPS = 1e-6;
+constexpr double PI = acos(-1.0);
+constexpr int HASH_KEY = 2791371;
+constexpr int OMPTHREADS = 4;
 
-inline double randDouble()
-{
-    return 1.0 * rand() / RAND_MAX;
-}
+
+#define randDouble ( 1.0 * rand() / 2147483647.0 )
+
+#define randUInt ( rand() )
+
+#define randID ( (rand() << 31) | rand() )
+
 }
 
 #endif // CONST_H

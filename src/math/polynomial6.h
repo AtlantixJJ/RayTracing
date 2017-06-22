@@ -14,12 +14,12 @@ public:
     std::vector<double> findAllRoots(double l, double r);
 
 private:
-    long double m_a[7], m_sturm[7][7];
-    std::vector<double> m_roots;
+    long double _a[7], _sturm[7][7];
+    std::vector<double> _roots;
 
-    void m_init();
-    bool m_findOneRoot(long double l, long double r, long double& x);
-    void m_findAllRoots(long double l, long double r);
+    void _init();
+    bool _findOneRoot(long double l, long double r, long double& x);
+    void _findAllRoots(long double l, long double r);
 };
 
 #endif // POLYNOMIAL6_H

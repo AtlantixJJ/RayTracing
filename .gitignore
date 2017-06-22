@@ -1,6 +1,8 @@
 .vscode
 Reference
 build
+pastsrc
+res1
 src/tools/CMakeFiles
 src/CMakeFiles
 tools/CMakeFiles

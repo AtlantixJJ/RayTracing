@@ -5,7 +5,8 @@
 Json::Value Light::toJson() const
 {
     Json::Value light;
-    light["color"] = m_color.toJson();
+    light["color"] = _color.toJson();
+    light["power"] = _power;
     return light;
 }
 

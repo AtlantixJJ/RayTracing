@@ -1,0 +1,1 @@
+proxychains scp -r src srthu2@103.41.53.120:Atlantix/RayTracing/

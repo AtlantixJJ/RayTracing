@@ -1,6 +1,6 @@
 #include "math/beziercurve3.h"
 
-BezierCurve3::BezierCurve3(const Vector2& p0, const Vector2& p1, const Vector2& p2, const Vector2& p3)
+BezierCurve3::BezierCurve3(const Point2D& p0, const Point2D& p1, const Point2D& p2, const Point2D& p3)
     : P0(p0), P1(p1), P2(p2), P3(p3),
       L(std::min(std::min(std::min(P0.x, P1.x), P2.x), P3.x)),
       R(std::max(std::max(std::max(P0.x, P1.x), P2.x), P3.x)),
@@ -18,14 +18,14 @@ BezierCurve3::BezierCurve3(const Json::Value& curve)
 {
 }
 
-Vector2 BezierCurve3::P(double t) const
+Point2D BezierCurve3::P(double t) const
 {
     double tt = t * t, ttt = tt * t;
     double s = 1 - t, ss = s * s, sss = ss * s;
     return P0 * sss + P1 * (3 * ss * t) + P2 * (3 * s * tt) + P3 * ttt;
 }
 
-Vector2 BezierCurve3::dP(double t) const
+Point2D BezierCurve3::dP(double t) const
 {
     double d = 3 * t * t,
            a = -d + 6 * t - 3,
@@ -34,7 +34,7 @@ Vector2 BezierCurve3::dP(double t) const
     return P0 * a + P1 * b + P2 * c + P3 * d;
 }
 
-void BezierCurve3::getEquation(Vector2& q0, Vector2& q1, Vector2& q2, Vector2& q3) const
+void BezierCurve3::getEquation(Point2D& q0, Point2D& q1, Point2D& q2, Point2D& q3) const
 {
     q0 = P0;
     q1 = (P1 - P0) * 3;

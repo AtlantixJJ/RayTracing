@@ -1,14 +1,12 @@
 #ifndef ROTATIONBODY_H
 #define ROTATIONBODY_H
 
-#include "common/vector3.h"
+#include "math/vector3.h"
 #include "object/object.h"
 #include "math/beziercurve3.h"
 
 #include <vector>
-/**
-*   
-**/
+
 class RotationBody : public Object
 {
 public:
@@ -20,38 +18,38 @@ public:
 
     virtual std::string getType() const override { return "RotationBody"; }
 
-    /// 与视线相交
-    virtual void collide(Collision* coll, 
-        const Vector3& start, const Vector3& dir) override;
+    // 与视线相交
+    virtual Intersection collide(const Ray& ray) const override;
 
-    /// 交点处的纹理颜色
-    virtual Color getTextureColor(const Collision& coll) const override;
+    // 交点处的纹理颜色
+    virtual Color getTextureColor(const Intersection& coll) const override;
 
     virtual Json::Value toJson() const override;
 
-    /// 设置纹理起点极角
-    void setTextureArg(double a) { m_arg = a; }
+    // 设置纹理起点极角
+    void setTextureArg(double a) { _arg = a; }
 
-    BezierCurve3 getCurve(int i) const { return m_curves[i]; }
-    void addCurve(const BezierCurve3& curve) { m_curves.push_back(curve); }
+    BezierCurve3 getCurve(int i) const { return _curves[i]; }
+    void addCurve(const BezierCurve3& curve) { _curves.push_back(curve); }
 
-    /// 曲面上一点 P(u, v)
+    // 曲面上一点 P(u, v)
     Vector3 P(int i, double u, double v) const;
 
-    /// 保存为 OBJ 格式
+    // 保存为 OBJ 格式
     void saveOBJ(const std::string& file, int density) const;
 
 private:
-    Vector3 m_o;                            // 底面中心点
-    Curves m_curves;                        // 曲线
-    double m_r, m_h, m_arg;                 // 包围圆柱体的底面半径、高，纹理起点极角
-    Cylinder* m_bounding_cylinder;          // 包围圆柱体
-    std::vector<Cylinder*> m_sub_cylinders; // 子旋转面的包围圆柱体
+    Vector3 _o;                            // 底面中心点
+    Curves _curves;                        // 曲线
+    double _r, _h, _arg;                 // 包围圆柱体的底面半径、高，纹理起点极角
+    Cylinder* _bounding_cylinder;          // 包围圆柱体
+    std::vector<Cylinder*> _sub_cylinders; // 子旋转面的包围圆柱体
+    std::vector<ID> _identifiers;      // 每个子旋转都有标识符
 
-    void m_init();
+    void _init();
 
-    Vector3 m_dPdu(int i, double u, double v) const; // 对 u 的偏导数
-    Vector3 m_dPdv(int i, double u, double v) const; // 对 v 的偏导数
+    Vector3 _dPdu(int i, double u, double v) const; // 对 u 的偏导数
+    Vector3 _dPdv(int i, double u, double v) const; // 对 v 的偏导数
 };
 
 #endif // ROTATIONBODY_H

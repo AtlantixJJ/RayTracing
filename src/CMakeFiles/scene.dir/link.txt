@@ -1,2 +1,0 @@
-/Library/Developer/CommandLineTools/usr/bin/ar qc lib/libscene.a  CMakeFiles/scene.dir/scene/camera.cpp.o CMakeFiles/scene.dir/scene/scene.cpp.o
-/Library/Developer/CommandLineTools/usr/bin/ranlib lib/libscene.a

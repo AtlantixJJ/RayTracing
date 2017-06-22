@@ -1,7 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "common/collision.h"
+#include "common/intersection.h"
 #include "object/material.h"
 
 class Plane;
@@ -14,20 +14,22 @@ class Object
 public:
     virtual ~Object();
 
-    const Material* getMaterial() const { return m_material; }
+    ID getIdentifier() const { return _identifier; }
+    const Material* getMaterial() const { return _material; }
+
     virtual std::string getType() const = 0;
 
     // 与视线相交
-    virtual void collide(Collision* coll, const Vector3& start, const Vector3& dir) =0;
+    virtual Intersection collide(const Ray& ray) const = 0;
 
     // 交点处的纹理颜色
-    virtual Color getTextureColor(const Collision& coll) const = 0;
+    virtual Color getTextureColor(const Intersection& coll) const = 0;
 
     // 保存为 JSON 格式
     virtual Json::Value toJson() const;
 
     // 保存 JSON 到文件
-    void save(const std::string& file) const;
+    virtual void save(const std::string& file) const;
 
     // 从 JSON 导入物体
     static Object* loadFromJson(const Json::Value& value);
@@ -39,10 +41,11 @@ protected:
     Object(const Material* m);
     Object(const Json::Value& object);
 
-    const Material* m_material;
+    const Material* _material;
+    ID _identifier; // 标识符
 
 private:
-    bool m_can_delete_material;
+    bool _can_delete_material;
 };
 
 #endif // OBJECT_H

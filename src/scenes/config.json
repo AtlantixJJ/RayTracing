@@ -1,0 +1,23 @@
+{
+	"ss_edge_t" : 0.01,
+	"ss_edge" : 0,
+	"ssnum" : 4,
+	"dof" : 0,
+	"enable_fresnel" : true,
+	"enable_texture_filter" : true,
+	"hightlight_exponent" : 50,
+	"newton_iters" : 20,
+	"snapshot_interval" : 2.0,
+	"photon_map_only" : true,
+	"photo_number" : 1000000,
+	"photo_sample" : 1000,
+	"phtrace_max_depth" : 10,
+	"ppm_alpha" : 0.999,
+	"ppm_search_rad" : 1,
+	"ppm_iteration_depth" : 1000,
+	"ppm_photo_number" : 100000,
+	"raytracing_max_depth" : 20,
+	"raytracing_min_weight" : 0.05,
+	"soft_shadow_samples" : 4,
+	"thread_max_number" : 4
+}

@@ -1,9 +1,9 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include "common/color.h"
-#include "common/collision.h"
-#include "common/photon.h"
+#include "common/common.h"
+#include "common/common.h"
+#include "common/intersection.h"
 
 class Scene;
 class PointLight;
@@ -11,23 +11,26 @@ class PointLight;
 class Light
 {
 public:
-    Light(const Color& c)
-        : m_color(c) {}
+    Light(const Color& c, double power = 1)
+        : _color(c), _power(power), _identifier(randID) {}
     Light(const Json::Value& light)
-        : m_color(light["color"]) {}
+        : _color(light["color"]), _power(light["power"].asDouble()), _identifier(randID) {}
     virtual ~Light() {}
 
-    Color getColor() const { return m_color; }
+    ID getIdentifier() const { return _identifier; }
+    Color getColor() const { return _color; }
+    double getPower() const { return _power; }
 
     // 发光点
     virtual Vector3 getSource() const = 0;
 
     // 与视线相交
-    virtual void collide(Collision* coll, const Vector3& start, const Vector3& dir) = 0;
+    virtual Intersection collide(const Ray& ray) const = 0;
 
     // 计算阴影比例，值越小阴影越深
     virtual double getShadowRatio(const Scene* scene, const Vector3& p) const = 0;
 
+    // 发射光子
     virtual Photon emitPhoton(double power) const = 0;
 
     // 保存为 JSON 格式
@@ -37,7 +40,9 @@ public:
     static Light* loadFromJson(const Json::Value& value);
 
 protected:
-    Color m_color;
+    Color _color;       // 光色
+    double _power;      // 光能
+    ID _identifier; // 标识符
 };
 
 #endif // LIGHT_H

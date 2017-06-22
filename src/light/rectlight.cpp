@@ -1,46 +1,37 @@
+#include "utils/config.h"
 #include "common/const.h"
 #include "light/rectlight.h"
 #include "object/object.h"
-#include "scene/scene.h"
+#include "env/scene.h"
 
-const int SHADOW_SAMPLE = 4;
-
-void RectLight::collide(Collision* coll, const Vector3& start, const Vector3& dir)
+Intersection RectLight::collide(const Ray& ray) const
 {
-    Vector3 n = dx * dy;
-    double d = n.dot(dir);
-    if (abs(d) < Const::EPS){
-        coll->collide();
-        return;
-    }
-    double t = (n.dot(o) - n.dot(start)) / d;
-    if (t < Const::EPS){
-        coll->collide();
-        return;
-    }
-
-    Vector3 p = start + dir * t - o;
-    if (abs(p.dot(dx)) + Const::EPS < dx.mod2() && abs(p.dot(dy)) + Const::EPS < dy.mod2())
-        coll->collide(start, dir, t, this);
+    Vector3 n = _dx * _dy;
+    double d = n.dot(ray.dir);
+    if (abs(d) < Const::EPS) return Intersection();
+    double t = (n.dot(_o) - n.dot(ray.start)) / d;
+    if (t < Const::EPS) return Intersection();
+    Vector3 p = ray.get(t) - _o;
+    if (abs(p.dot(_dx)) + Const::EPS < _dx.mod2() && abs(p.dot(_dy)) + Const::EPS < _dy.mod2())
+        return Intersection(ray, t, this);
     else
-        coll->collide();
+        return Intersection();
 }
 
 double RectLight::getShadowRatio(const Scene* scene, const Vector3& p) const
 {
-    int ret = SHADOW_SAMPLE * SHADOW_SAMPLE;
-    Collision coll;
-    for (int i = 0; i < SHADOW_SAMPLE; i++)
-        for (int j = 0; j < SHADOW_SAMPLE; j++)
+    int samples = Config::soft_shadow_samples, ret = samples * samples;
+    for (int i = 0; i < samples; i++)
+        for (int j = 0; j < samples; j++)
         {
-            double x = (i + 0.5) * 2 / SHADOW_SAMPLE - 1,
-                   y = (j + 0.5) * 2 / SHADOW_SAMPLE - 1;
-            Vector3 c = o + dx * x + dy * y, dir = c - p;
+            double x = (i + 0.5) * 2 / samples - 1,
+                   y = (j + 0.5) * 2 / samples - 1;
+            Vector3 c = _o + _dx * x + _dy * y, dir = c - p;
             double dist = dir.mod();
 
             for (auto o = scene->objectsBegin(); o != scene->objectsEnd(); o++)
             {
-                (*o)->collide(&coll, p, dir);
+                Intersection coll = (*o)->collide(Ray(p, dir));
                 if (coll.isHit() && coll.dist + Const::EPS < dist)
                 {
                     ret--;
@@ -48,21 +39,22 @@ double RectLight::getShadowRatio(const Scene* scene, const Vector3& p) const
                 }
             }
         }
-    return 1.0 * ret / SHADOW_SAMPLE / SHADOW_SAMPLE;
+    return 1.0 * ret / samples / samples;
+}
+
+Photon RectLight::emitPhoton(double power) const
+{
+    return Photon(_o + _dx * (2 * randDouble - 1) + _dy * (2 * randDouble - 1),
+                  _n.diffuse(), _color * power);
 }
 
 Json::Value RectLight::toJson() const
 {
     Json::Value light = Light::toJson();
     light["type"] = "RectLight";
-    light["o"] = o.toJson();
-    light["dx"] = dx.toJson();
-    light["dy"] = dy.toJson();
+    light["o"] = _o.toJson();
+    light["n"] = _n.toJson();
+    light["dx"] = _dx.toJson();
+    light["dy"] = _dy.toJson();
     return light;
-}
-
-Photon RectLight::emitPhoton(double power) const
-{
-    return Photon(o + dx * (2 * Const::randDouble() - 1) + dy * (2 * Const::randDouble() - 1),
-                  n.diffuse(), m_color * (power / m_color.power()));
 }
