@@ -1,4 +1,4 @@
-set(MODELING_SRCS modeling.cpp)
+set(MODELING_SRCS mesh.cpp)
 set(TESTOR_SRCS test.cpp)
 set(RENDER_SRCS render.cpp)
 set(GEN_SRCS genscene.cpp)

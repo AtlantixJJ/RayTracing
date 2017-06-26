@@ -6,6 +6,7 @@
 
 PhotonMap::~PhotonMap()
 {
+    omp_destroy_lock(&lockp);
     if (_photons) delete[] _photons;
     if (_plane) delete[] _plane;
 }

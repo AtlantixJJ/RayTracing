@@ -14,7 +14,7 @@ class Object
 public:
     virtual ~Object();
 
-    ID getIdentifier() const { return _identifier; }
+    ID getIdentifier() const { return _id; }
     const Material* getMaterial() const { return _material; }
 
     virtual std::string getType() const = 0;
@@ -28,21 +28,17 @@ public:
     // 保存为 JSON 格式
     virtual Json::Value toJson() const;
 
-    // 保存 JSON 到文件
-    virtual void save(const std::string& file) const;
+    virtual void save2Json(const std::string& file) const;
 
-    // 从 JSON 导入物体
-    static Object* loadFromJson(const Json::Value& value);
-
-    // 从文件导入物体
-    static Object* loadFrom(const std::string& file);
+    static Object* fromJson(const Json::Value& value);
+    static Object* loadFile(const std::string& file);
 
 protected:
     Object(const Material* m);
     Object(const Json::Value& object);
 
     const Material* _material;
-    ID _identifier; // 标识符
+    ID _id; // 标识符
 
 private:
     bool _can_delete_material;

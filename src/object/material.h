@@ -17,18 +17,21 @@ public:
 
     virtual ~Material();
 
-    Color color, absorb_color; // 颜色，透射时吸收的颜色
-    double diff, spec;         // 漫反射系数，镜面反射系数
-    double refl, refr;         // 反射和折射光的比例
-    double rindex;             // 折射率
+    Color color, absorb_color;
+    double diff, spec;         // diffusion
+
 
     bool hasTexture() const { return _texture || _texture_func; }
 
-    void setTexture(Bmp* texture) { _texture_func = nullptr, _texture = texture; }
+    void setTexture(Bmp* texture) {
+        _texture_func = nullptr;
+         _texture = texture;
+    }
     void setTexture(Color (*func)(double, double))
     {
         if (_texture) delete _texture;
-        _texture = nullptr, _texture_func = func;
+        _texture = nullptr;
+        _texture_func = func;
     }
     Color getTextureColor(double u, double v) const;
     bool compare(const Material* B) const;
@@ -36,6 +39,8 @@ public:
 
     virtual Json::Value toJson() const;
 
+    double refl, refr;
+    double rindex;
 private:
     Bmp* _texture; 
     Color (*_texture_func)(double, double);

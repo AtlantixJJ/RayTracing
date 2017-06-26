@@ -37,10 +37,10 @@ public:
     Json::Value toJson() const;
 
     // 保存 JSON 到文件
-    void save(const std::string& file) const;
+    void save2Json(const std::string& file) const;
 
     // 从文件导入场景
-    static Scene* loadFrom(const std::string& file);
+    static Scene* loadFile(const std::string& file);
 
 private:
     Camera* _camera;      // 相机

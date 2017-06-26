@@ -26,6 +26,7 @@ double RectLight::getShadowRatio(const Scene* scene, const Vector3& p) const
         {
             double x = (i + 0.5) * 2 / samples - 1,
                    y = (j + 0.5) * 2 / samples - 1;
+                   
             Vector3 c = _o + _dx * x + _dy * y, dir = c - p;
             double dist = dir.mod();
 

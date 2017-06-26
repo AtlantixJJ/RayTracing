@@ -29,7 +29,7 @@ public:
         _data[x][y] = BmpColor(color.r * 255 + 0.5, color.g * 255 + 0.5, color.b * 255 + 0.5);
     }
 
-    void save(const std::string& file) const;
+    void save2Json(const std::string& file) const;
     std::string getFilename() const { return _file_name; }
 
 private:

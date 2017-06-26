@@ -12,12 +12,12 @@ class Light
 {
 public:
     Light(const Color& c, double power = 1)
-        : _color(c), _power(power), _identifier(randID) {}
+        : _color(c), _power(power), _id(randID) {}
     Light(const Json::Value& light)
-        : _color(light["color"]), _power(light["power"].asDouble()), _identifier(randID) {}
+        : _color(light["color"]), _power(light["power"].asDouble()), _id(randID) {}
     virtual ~Light() {}
 
-    ID getIdentifier() const { return _identifier; }
+    ID getIdentifier() const { return _id; }
     Color getColor() const { return _color; }
     double getPower() const { return _power; }
 
@@ -37,12 +37,12 @@ public:
     virtual Json::Value toJson() const;
 
     // 从 JSON 导入物体
-    static Light* loadFromJson(const Json::Value& value);
+    static Light* fromJson(const Json::Value& value);
 
 protected:
     Color _color;       // 光色
     double _power;      // 光能
-    ID _identifier; // 标识符
+    ID _id; // 标识符
 };
 
 #endif // LIGHT_H

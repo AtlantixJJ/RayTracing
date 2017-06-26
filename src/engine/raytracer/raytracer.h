@@ -16,7 +16,6 @@ public:
     virtual void run(const std::string& outFile) override;
 protected:
     bool isbase;
-    bool** _is_edge; ///< Only do Super Resulution on edges to speed up
     int _cur_x, _cur_y; ///< the current tracing element
     ID** _hash; ///< using hash to accerlerate inersection
 

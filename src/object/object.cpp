@@ -9,14 +9,14 @@
 
 Object::Object(const Material* m)
     : _material(m == nullptr ? new Material() : m),
-      _identifier(randID),
+      _id(randID),
       _can_delete_material(m == nullptr ? true : false)
 {
 }
 
 Object::Object(const Json::Value& object)
     : _material(object["material"].isNull() ? new Material() : new Material(object["material"])),
-      _identifier(randID),
+      _id(randID),
       _can_delete_material(true)
 {
 }
@@ -33,14 +33,14 @@ Json::Value Object::toJson() const
     return object;
 }
 
-void Object::save(const std::string& file) const
+void Object::save2Json(const std::string& file) const
 {
     std::ofstream fout(file.c_str());
     fout << this->toJson() << std::endl;
     fout.close();
 }
 
-Object* Object::loadFromJson(const Json::Value& value)
+Object* Object::fromJson(const Json::Value& value)
 {
     std::string type = value["type"].asString();
     if (type == "Plane")
@@ -55,7 +55,7 @@ Object* Object::loadFromJson(const Json::Value& value)
         return nullptr;
 }
 
-Object* Object::loadFrom(const std::string& file)
+Object* Object::loadFile(const std::string& file)
 {
     Json::Value obj;
     std::ifstream fin(file.c_str());
@@ -67,5 +67,5 @@ Object* Object::loadFrom(const std::string& file)
     fin >> obj;
     fin.close();
 
-    return loadFromJson(obj);
+    return fromJson(obj);
 }

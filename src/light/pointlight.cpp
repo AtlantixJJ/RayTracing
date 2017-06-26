@@ -5,7 +5,7 @@
 
 Intersection PointLight::collide(const Ray& ray) const
 {
-    return Intersection(); // 点光源永远不会与视线相交
+    return Intersection(); 
 }
 
 double PointLight::getShadowRatio(const Scene* scene, const Vector3& p) const

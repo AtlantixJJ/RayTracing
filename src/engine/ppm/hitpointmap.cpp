@@ -6,6 +6,7 @@
 
 HitPointMap::~HitPointMap()
 {
+    omp_destroy_lock(&lockp);
     if (_nodes) delete[] _nodes;
     if (_plane) delete[] _plane;
     _points.clear();
@@ -13,10 +14,10 @@ HitPointMap::~HitPointMap()
 
 void HitPointMap::incomingPhoton(const Photon& photon)
 {
-    _findNearHitPoints(0, _n, photon);
+    _findHitPointsbyDist(0, _n, photon);
 }
 
-void HitPointMap::build()
+void HitPointMap::buildKDTree()
 {
     if (_nodes) delete[] _nodes;
     if (_plane) delete[] _plane;
@@ -35,17 +36,16 @@ void HitPointMap::update()
     for (auto& point : _points)
         if (point.M)
         {
-            double k = (point.N + point.M * Config::ppm_alpha) / (point.N + point.M);
-            
+            double k = (point.N + point.M * Config::ppm_dec) / (point.N + point.M);
             point.r2 *= k;
             point.flux *= k;
-            point.N += point.M * Config::ppm_alpha;
+            point.N += point.M * Config::ppm_dec;
             point.M = 0;
         }
     _rebuild(0, _n);
 }
 
-void HitPointMap::_findNearHitPoints(int l, int r, const Photon& photon)
+void HitPointMap::_findHitPointsbyDist(int l, int r, const Photon& photon)
 {
     if (l >= r) return;
     int mi = (l + r) >> 1, k = _plane[mi];
@@ -66,13 +66,13 @@ void HitPointMap::_findNearHitPoints(int l, int r, const Photon& photon)
 
     if (pos[k] - _nodes[mi].point->pos[k] < 0)
     {
-        _findNearHitPoints(l, mi, photon);
-        _findNearHitPoints(mi + 1, r, photon);
+        _findHitPointsbyDist(l, mi, photon);
+        _findHitPointsbyDist(mi + 1, r, photon);
     }
     else
     {
-        _findNearHitPoints(mi + 1, r, photon);
-        _findNearHitPoints(l, mi, photon);
+        _findHitPointsbyDist(mi + 1, r, photon);
+        _findHitPointsbyDist(l, mi, photon);
     }
 }
 
@@ -81,11 +81,12 @@ void HitPointMap::_build(int l, int r)
     if (l >= r) return;
     int mi = (l + r) >> 1, k;
 
-    // 选择方差最小的坐标分量进行划分
     double mean[3] = {0}, var[3] = {0};
     for (int i = l; i < r; i++)
         for (int j = 0; j < 3; j++) mean[j] += _points[i].pos[j];
-    mean[0] /= r - l, mean[1] /= r - l, mean[2] /= r - l;
+    mean[0] /= r - l;
+    mean[1] /= r - l;
+    mean[2] /= r - l;
     for (int i = l; i < r; i++)
         for (int j = 0; j < 3; j++) var[j] += (_points[i].pos[j] - mean[j]) * (_points[i].pos[j] - mean[j]);
     if (var[0] > var[1] && var[0] > var[2])

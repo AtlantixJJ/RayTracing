@@ -42,14 +42,10 @@ Intersection Cylinder::collide(const Ray& ray) const
             if (q.mod2() < _r * _r + Const::EPS && in)
                 return Intersection(uray, t2, u2, q.arg(), Vector3(0, 0, -d3.z), this, in);
         }
-        else // 若射线不和上下底面所在的平面相交，则无交点
+        else
             return Intersection();
     }
-
-    // 若射线垂直于 xy 平面，则交点不会在圆柱面上
     if (d2.mod2() < Const::EPS && t < 0) return Intersection();
-
-    // 否则第一个交点为圆柱面
     double tca = oc.dot(d2.normalize()), thc2 = _r * _r - oc.mod2() + tca * tca;
     if (thc2 >= 0)
     {

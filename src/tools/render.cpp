@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     string file(argv[1]);
 
     Engine* engine;
-    Scene* scene = Scene::loadFrom(file);
+    Scene* scene = Scene::loadFile(file);
     switch (atoi(argv[2]))
     {
     case 0:

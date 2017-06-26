@@ -1,29 +1,43 @@
 #include "common/const.h"
 #include "object/geometry.h"
 #include "object/rotationbody.h"
-#include "math/polynomial6.h"
+#include "math/polynomial.h"
 
 RotationBody::RotationBody(const Vector3& o, const Curves& curves, const Material* m)
     : Object(m), _o(o), _curves(curves),
-      _r(0), _h(0), _arg(0)
+      _r(0), _h(0), _arg(0), _texture_ratios()
 {
+    for (size_t i = 0; i < _curves.size(); i++)
+        _texture_ratios.push_back(1.0 / _curves.size());
     _init();
 }
 
 RotationBody::RotationBody(const Json::Value& object)
     : Object(object), _o(object["o"]), _curves(),
-      _r(0), _h(0), _arg(fmod(object["texture_arg"].asDouble() / 180 * Const::PI, 2 * Const::PI))
+      _r(0), _h(0),
+      _arg(fmod(object["texture_arg"].asDouble() / 180 * Const::PI, 2 * Const::PI)), _texture_ratios()
 {
+    /// push back points of bezier curve
     for (auto c : object["curves"])
-        _curves.push_back(BezierCurve3(c));
+        _curves.push_back(BezierCurve(c));
+
+    /// 
+    if (object["texture_ratios"].isArray()){
+        for (auto r : object["texture_ratios"])
+            _texture_ratios.push_back(r.asDouble());
+    }else{
+        size_t i;
+        for (i = 0; i < _curves.size(); i++)
+            _texture_ratios.push_back(1.0 / _curves.size());
+    }
     _init();
 }
 
 RotationBody::~RotationBody()
 {
     if (_bounding_cylinder) delete _bounding_cylinder;
-    for (auto c : _sub_cylinders) delete c;
-    _sub_cylinders.clear();
+    for (auto c : _ssc) delete c;
+    _ssc.clear();
 }
 
 Intersection RotationBody::collide(const Ray& ray) const
@@ -32,33 +46,29 @@ Intersection RotationBody::collide(const Ray& ray) const
     Vector3 d = uray.dir;
     int curve_id = 0;
     Point2D res(1e9, 0);
-
     Intersection coll = _bounding_cylinder->collide(ray);
     if (!coll.isHit()) return Intersection();
-
-    for (size_t i = 0; i < _curves.size(); i++)
-    {
-        coll = _sub_cylinders[i]->collide(ray);
+    for (size_t i = 0; i < _curves.size(); i++){
+        coll = _ssc[i]->collide(ray);
         if (!coll.isHit() || (!coll.isInternal() && coll.dist > res.x - Const::EPS)) continue;
 
         Vector3 o = ray.start - _o;
-        Point2D w = d.toPoint2D(), q0, q1, q2, q3;
+        Point2D w = d.toPoint2D(), coe0, coe1, coe2, coe3;
         // A.y^2 + B.y + C + D.x^2 = 0
         long double A = w.mod2(), B = 2 * w.dot(o.toPoint2D()) * d.z - 2 * o.z * A,
                     C = Point2D(o.z * d.x - o.x * d.z, o.z * d.y - o.y * d.z).mod2(), D = -d.z * d.z,
                     a[7];
 
-        // a0 + a1.u + a2.u^2 + a3.u^3 + a4.u^4 + a5.u^5 + a6.u^6 = 0
-        _curves[i].getEquation(q0, q1, q2, q3);
-        a[0] = A * q0.y * q0.y + D * q0.x * q0.x + C + B * q0.y;
-        a[1] = 2 * A * q0.y * q1.y + 2 * D * q0.x * q1.x + B * q1.y;
-        a[2] = A * (q1.y * q1.y + 2 * q0.y * q2.y) + D * (q1.x * q1.x + 2 * q0.x * q2.x) + B * q2.y;
-        a[3] = 2 * A * (q0.y * q3.y + q1.y * q2.y) + 2 * D * (q0.x * q3.x + q1.x * q2.x) + B * q3.y;
-        a[4] = A * (2 * q1.y * q3.y + q2.y * q2.y) + D * (2 * q1.x * q3.x + q2.x * q2.x);
-        a[5] = 2 * (A * q2.y * q3.y + D * q2.x * q3.x);
-        a[6] = A * q3.y * q3.y + D * q3.x * q3.x;
+        _curves[i].equation(coe0,coe1,coe2,coe3);
+        a[0] = A * coe0.y * coe0.y + D * coe0.x * coe0.x + C + B * coe0.y;
+        a[1] = 2 * A * coe0.y * coe1.y + 2 * D * coe0.x * coe1.x + B * coe1.y;
+        a[2] = A * (coe1.y * coe1.y + 2 * coe0.y * coe2.y) + D * (coe1.x * coe1.x + 2 * coe0.x * coe2.x) + B * coe2.y;
+        a[3] = 2 * A * (coe0.y * coe3.y + coe1.y * coe2.y) + 2 * D * (coe0.x * coe3.x + coe1.x * coe2.x) + B * coe3.y;
+        a[4] = A * (2 * coe1.y * coe3.y + coe2.y * coe2.y) + D * (2 * coe1.x * coe3.x + coe2.x * coe2.x);
+        a[5] = 2 * (A * coe2.y * coe3.y + D * coe2.x * coe3.x);
+        a[6] = A * coe3.y * coe3.y + D * coe3.x * coe3.x;
 
-        Polynomial6 poly(a);
+        Polynomial poly(a);
         std::vector<double> roots = poly.findAllRoots(0, 1);
         for (auto u : roots)
         {
@@ -88,9 +98,13 @@ Intersection RotationBody::collide(const Ray& ray) const
         Point2D v = (uray.get(res.x) - _o).toPoint2D().normalize(), dp = _curves[curve_id].dP(res.y);
         Vector3 n = Vector3(-dp.y * v.x, -dp.y * v.y, dp.x);
         if (n.dot(d) < Const::EPS)
-            return Intersection(uray, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), n, this, _identifiers[curve_id]);
+            return Intersection(uray,
+             res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI),
+              n, this, _ids[curve_id]);
         else
-            return Intersection(uray, res.x, curve_id + res.y, fmod(v.arg(), 2 * Const::PI), -n, this, _identifiers[curve_id]);
+            return Intersection(uray, res.x, curve_id + res.y,
+             fmod(v.arg(), 2 * Const::PI), -n,
+              this, _ids[curve_id]);
     }
     else
         return Intersection();
@@ -100,8 +114,9 @@ Color RotationBody::getTextureColor(const Intersection& coll) const
 {
     if (_material->hasTexture())
     {
+        int id = coll.u;
         double u = fmod(coll.v - _arg + 4 * Const::PI, 2 * Const::PI) / 2 / Const::PI,
-               v = 1 - coll.u / _curves.size();
+               v = 1 - (_texture_ratios_sum[id] + (coll.u - id) * _texture_ratios[id]);
         return _material->getTextureColor(u, v);
     }
     else
@@ -114,7 +129,7 @@ Vector3 RotationBody::P(int i, double u, double v) const
     return Vector3(p.x * cos(v), p.x * sin(v), p.y) + _o;
 }
 
-void RotationBody::saveOBJ(const std::string& file, int density) const
+void RotationBody::save2JsonOBJ(const std::string& file, int density) const
 {
     std::vector<Vector3> points;
     std::vector<std::vector<int>> meshes;
@@ -139,11 +154,13 @@ void RotationBody::saveOBJ(const std::string& file, int density) const
 Json::Value RotationBody::toJson() const
 {
     Json::Value object = Object::toJson();
-    Json::Value curves;
+    Json::Value curves, ratios;
     for (auto c : _curves) curves.append(c.toJson());
+    for (auto r : _texture_ratios) ratios.append(r);
     object["type"] = "RotationBody";
     object["o"] = _o.toJson();
     object["curves"] = curves;
+    object["texture_ratios"] = ratios;
     if (_material->hasTexture()) object["texture_arg"] = _arg * 180 / Const::PI;
     return object;
 }
@@ -154,10 +171,15 @@ void RotationBody::_init()
     {
         double r = std::max(abs(c.L), abs(c.R));
         _r = std::max(_r, r), _h = std::max(_h, c.U);
-        _sub_cylinders.push_back(new Cylinder(Vector3(_o.x, _o.y, _o.z + c.D), r, c.U - c.D));
-        _identifiers.push_back(randID);
+        _ssc.push_back(new Cylinder(Vector3(_o.x, _o.y, _o.z + c.D), r, c.U - c.D));
+        _ids.push_back(randID);
     }
     _bounding_cylinder = new Cylinder(_o, _r, _h);
+
+    double s = 0;
+    _texture_ratios_sum.clear();
+    for (double r : _texture_ratios)
+        _texture_ratios_sum.push_back(s), s += r;
 }
 
 Vector3 RotationBody::_dPdu(int i, double u, double v) const

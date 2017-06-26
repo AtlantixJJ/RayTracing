@@ -26,22 +26,22 @@ Scene::Scene(const Json::Value& scene)
 {
     for (auto l : scene["lights"])
     {
-        Light* light = Light::loadFromJson(l);
+        Light* light = Light::fromJson(l);
         if (light) _lights.push_back(light);
     }
     for (auto o : scene["objects"])
     {
         Object* object;
         if (o.isString())
-            object = Object::loadFrom(_scene_file_dir + "/" + o.asString());
+            object = Object::loadFile(_scene_file_dir + "/" + o.asString());
         else
-            object = Object::loadFromJson(o);
+            object = Object::fromJson(o);
         if (object) _objects.push_back(object);
     }
 
     Json::Value config = scene["config"];
     if (config.isString())
-        Config::loadFrom(_scene_file_dir + "/" + config.asString());
+        Config::loadFile(_scene_file_dir + "/" + config.asString());
     else if (!config.isNull())
         Config::load(config);
 
@@ -95,14 +95,14 @@ Json::Value Scene::toJson() const
     return scene;
 }
 
-void Scene::save(const std::string& file) const
+void Scene::save2Json(const std::string& file) const
 {
     std::ofstream fout(file.c_str());
     fout << this->toJson() << std::endl;
     fout.close();
 }
 
-Scene* Scene::loadFrom(const std::string& file)
+Scene* Scene::loadFile(const std::string& file)
 {
     Json::Value scene;
     std::ifstream fin(file.c_str());

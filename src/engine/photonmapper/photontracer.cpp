@@ -99,18 +99,15 @@ void PhotonTracer::_photonTracing(Photon& photon, int depth, bool isInternal)
     Intersection coll = _scene->findNearestIntersection(Ray(photon.pos, photon.dir));
     if (coll.isHit() && coll.atObject())
     {
-        omp_set_lock(&lock2);
-        asd++;
-        omp_unset_lock(&lock2);
         photon.pos = coll.p;
         const Object* obj = coll.getObject();
         const Material* material = obj->getMaterial();
         if (material->diff > Const::EPS)
         {
-            //omp_set_lock(&lock2);
+            omp_set_lock(&lock2);
             if (_photon_map) _photon_map->addPhoton(photon);
             if (_hit_point_map) _hit_point_map->incomingPhoton(photon);
-            //omp_unset_lock(&lock2);
+            omp_unset_lock(&lock2);
         }
 
         Color cd = material->color * obj->getTextureColor(coll), ct(1, 1, 1);

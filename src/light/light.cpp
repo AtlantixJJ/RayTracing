@@ -10,7 +10,7 @@ Json::Value Light::toJson() const
     return light;
 }
 
-Light* Light::loadFromJson(const Json::Value& value)
+Light* Light::fromJson(const Json::Value& value)
 {
     std::string type = value["type"].asString();
     if (type == "PointLight")

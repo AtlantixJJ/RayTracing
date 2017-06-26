@@ -86,7 +86,7 @@ Color Bmp::getColor(double u, double v) const
         return getColor(int(u + 0.5), int(v + 0.5));
 }
 
-void Bmp::save(const std::string& file) const
+void Bmp::save2Json(const std::string& file) const
 {
     FILE* f = fopen(file.c_str(), "wb");
 

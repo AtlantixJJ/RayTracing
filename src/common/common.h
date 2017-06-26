@@ -91,8 +91,8 @@ public:
     Photon(const Vector3& p, const Vector3& d, const Color& power)
         : pos(p), dir(d), pow(power) {}
 
-    Vector3 pos, dir; // 光子位置，方向
-    Color pow;        // 光子能量，即光通量 Phi
+    Vector3 pos, dir; 
+    Color pow;  
 };
 
 inline std::ostream& operator << (std::ostream &out, Photon ph){
@@ -106,10 +106,8 @@ struct Ray
     Ray(const Vector3& s, const Vector3& d)
         : start(s), dir(d) {}
 
-    // 射线上一点
     Vector3 get(double t) const { return start + dir * t; }
 
-    // 单位化方向
     Ray normalize() const { return Ray(start, dir.normalize()); }
 
     Vector3 start, dir;

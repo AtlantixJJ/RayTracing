@@ -6,12 +6,6 @@
 #include <json/reader.h>
 #include <json/writer.h>
 
-double Config::ss_edge_t = 0.01;
-
-int Config::ss_edge = 0;
-
-int Config::ssnum = 4;
-
 int Config::dof = 8;
 
 bool Config::enable_fresnel = true;
@@ -28,7 +22,7 @@ int Config::photo_sample = 1000;
 
 int Config::phtrace_max_depth = 10;
 
-double Config::ppm_alpha = 0.7;
+double Config::ppm_dec = 0.7;
 
 double Config::ppm_search_rad = 0.1;
 
@@ -50,9 +44,6 @@ int Config::thread_max_number = 4;
 
 void Config::load(const Json::Value& config)
 {
-    ss_edge_t = config["ss_edge_t"].asDouble();
-    ss_edge = config["ss_edge"].asInt();
-    ssnum = config["ssnum"].asInt();
     dof = config["dof"].asInt();
     enable_fresnel = config["enable_fresnel"].asBool();
     enable_texture_filter = config["enable_texture_filter"].asBool();
@@ -63,7 +54,7 @@ void Config::load(const Json::Value& config)
     photo_number = config["photo_number"].asInt();
     photo_sample = config["photo_sample"].asInt();
     phtrace_max_depth = config["phtrace_max_depth"].asInt();
-    ppm_alpha = config["ppm_alpha"].asDouble();
+    ppm_dec = config["ppm_dec"].asDouble();
     ppm_search_rad = config["ppm_search_rad"].asDouble();
     ppm_iteration_depth = config["ppm_iteration_depth"].asInt();
     ppm_photo_number = config["ppm_photo_number"].asInt();
@@ -76,10 +67,6 @@ void Config::load(const Json::Value& config)
 Json::Value Config::toJson()
 {
     Json::Value config;
-    config["ss_edge_t"] = ss_edge_t;
-    config["ss_edge"] = ss_edge;
-    config["ssnum"] = ssnum;
-    config["dof"] = dof;
     config["enable_fresnel"] = enable_fresnel;
     config["enable_texture_filter"] = enable_texture_filter;
     config["hightlight_exponent"] = hightlight_exponent;
@@ -89,7 +76,7 @@ Json::Value Config::toJson()
     config["photo_number"] = photo_number;
     config["photo_sample"] = photo_sample;
     config["phtrace_max_depth"] = phtrace_max_depth;
-    config["ppm_alpha"] = ppm_alpha;
+    config["ppm_dec"] = ppm_dec;
     config["ppm_search_rad"] = ppm_search_rad;
     config["ppm_iteration_depth"] = ppm_iteration_depth;
     config["ppm_photo_number"] = ppm_photo_number;
@@ -100,22 +87,17 @@ Json::Value Config::toJson()
     return config;
 }
 
-void Config::save(const std::string& file)
+void Config::save2Json(const std::string& file)
 {
     std::ofstream fout(file.c_str());
     fout << toJson() << std::endl;
     fout.close();
 }
 
-void Config::loadFrom(const std::string& file)
+void Config::loadFile(const std::string& file)
 {
     Json::Value config;
     std::ifstream fin(file.c_str());
-    if (!fin)
-    {
-        std::cerr << "ERROR: No such config file '" + file + "'" << std::endl;
-        return;
-    }
     fin >> config;
     fin.close();
 

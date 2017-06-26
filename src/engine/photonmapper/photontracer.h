@@ -7,17 +7,18 @@ class PhotonMap;
 class HitPointMap;
 #include "omp.h"
 
+/**
+* This class is shared by PM and PPM
+**/
 class PhotonTracer
 {
 public:
-    // 用于普通光子映射
     PhotonTracer(Scene* scene, PhotonMap* map)
         : _photon_map(map), _hit_point_map(nullptr), _scene(scene) {
             omp_init_lock(&lock);
             omp_init_lock(&lock2);
         }
 
-    // 用于 PPM
     PhotonTracer(Scene* scene, HitPointMap* map)
         : _photon_map(nullptr), _hit_point_map(map), _scene(scene) {
             omp_init_lock(&lock);
@@ -29,7 +30,6 @@ public:
         omp_destroy_lock(&lock2);
     }
 
-    // 发射光子
     void emitPhotons(int photonNumber);
 
 private:

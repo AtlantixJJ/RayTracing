@@ -3,5 +3,5 @@
 
 int main()
 {
-    Config::save("config.json");
+    Config::save2Json("config.json");
 }

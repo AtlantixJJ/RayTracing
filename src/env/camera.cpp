@@ -47,7 +47,7 @@ Ray Camera::emit(double x, double y) const
 
 Ray Camera::dofEmit(double x, double y) const
 {
-    Vector3 focalPoint = _eye + emit(x, y).dir.normalize() * _focal_len;
+    Vector3 focal = _eye + emit(x, y).dir.normalize() * _focal_len;
     double dx, dy;
     for (;;)
     {
@@ -56,31 +56,8 @@ Ray Camera::dofEmit(double x, double y) const
         if (dx * dx + dy * dy <= 1) break;
     }
     Vector3 start = _eye + _dw.normalize() * _aperture * dx + _dh.normalize() * _aperture * dy;
-    return Ray(start, focalPoint - start);
-}
-
-std::vector<pair<int, int>> Camera::detectEdge() const
-{
-    std::vector<pair<int, int>> list;
-    for (int i = 0; i < _w; i++)
-        for (int j = 0; j < _h; j++)
-        {
-            // Roberts cross operator
-            Color gx = getColor(i, j) - getColor(i + 1, j + 1),
-                  gy = getColor(i + 1, j) - getColor(i, j + 1);
-            if (gx.mod2() + gy.mod2() > Config::ss_edge_t)
-            {
-                list.push_back(make_pair(i, j));
-                if (i < _w - 1 && j < _h - 1) list.push_back(make_pair(i + 1, j + 1));
-                if (i < _w - 1) list.push_back(make_pair(i + 1, j));
-                if (j < _h - 1) list.push_back(make_pair(i, j + 1));
-            }
-        }
-
-    sort(list.begin(), list.end());
-    auto iter = unique(list.begin(), list.end());
-    list.erase(iter, list.end());
-    return list;
+    
+    return Ray(start, focal-start);
 }
 
 void Camera::print(const std::string& file) const
@@ -88,11 +65,11 @@ void Camera::print(const std::string& file) const
     Bmp* film = new Bmp(_w, _h);
     for (int i = 0; i < _w; i++)
         for (int j = 0; j < _h; j++) film->setColor(i, j, _color[i][j].confine());
-    film->save(file);
+    film->save2Json(file);
     delete film;
 }
 
-Bmp* Camera::copyFilm() const
+Bmp* Camera::copyf() const
 {
     Bmp* bmp = new Bmp(_w, _h);
     for (int i = 0; i < _w; i++)
@@ -100,7 +77,7 @@ Bmp* Camera::copyFilm() const
     return bmp;
 }
 
-void Camera::setFilm(const Bmp* film)
+void Camera::setf(const Bmp* film)
 {
     for (int i = 0; i < _w; i++)
         for (int j = 0; j < _h; j++) setColor(i, j, film->getColor(i, j));

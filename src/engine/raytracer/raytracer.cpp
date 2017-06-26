@@ -13,12 +13,8 @@ RayTracer::RayTracer(Scene* scene)
     if (scene)
     {
         _hash = new ID*[_w];
-        _is_edge = new bool*[_w];
         for (int i = 0; i < _w; i++)
-        {
             _hash[i] = new ID[_h];
-            _is_edge[i] = new bool[_h];
-        }
     }
 }
 
